@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiệp Mời Lễ Tốt Nghiệp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, #1e293b, #0f172a);
+      font-family: 'Montserrat', sans-serif;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Hiệu ứng phong bì */
+    .envelope-wrapper {
+      position: relative;
+      width: 320px;
+      height: 220px;
+      background: #851e3e;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .envelope-wrapper:hover {
+      transform: translateY(-5px);
+    }
+
+    .envelope-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 0;
+      height: 0;
+      border-left: 160px solid transparent;
+      border-right: 160px solid transparent;
+      border-top: 130px solid #a7264e;
+      transform-origin: top;
+      transition: transform 0.5s 0.2s, z-index 0.2s;
+      z-index: 3;
+    }
+
+    .envelope-wrapper.open::before {
+      transform: rotateX(180deg);
+      z-index: 0;
+    }
+
+    .envelope-front-flaps {
+      position: absolute;
+      bottom: 0;
+      width: 0;
+      height: 0;
+      border-left: 160px solid #942246;
+      border-right: 160px solid #942246;
+      border-top: 110px solid transparent;
+      border-radius: 0 0 10px 10px;
+      z-index: 2;
+    }
+
+    .seal-btn {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #d4af37;
+      color: #3d2b00;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      z-index: 4;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .envelope-wrapper.open .seal-btn {
+      opacity: 0;
+    }
+
+    /* Lá thư / Tấm thiệp bên trong */
+    .card {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 300px;
+      background: #fffdfa;
+      border-radius: 8px;
+      padding: 24px 20px;
+      text-align: center;
+      color: #2c3e50;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .envelope-wrapper.open .card {
+      transform: translateY(-160px);
+      z-index: 5;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .card-border {
+      border: 1.5px solid #d4af37;
+      padding: 16px 12px;
+      border-radius: 6px;
+    }
+
+    .icon-grad {
+      font-size: 32px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #851e3e;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      margin: 8px 0;
+    }
+
+    .name {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #b8860b;
+      margin-bottom: 12px;
+    }
+
+    .details {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #4a5568;
+      margin-bottom: 16px;
+      border-top: 1px dashed #e2e8f0;
+      border-bottom: 1px dashed #e2e8f0;
+      padding: 10px 0;
+    }
+
+    .details p strong {
+      color: #1a202c;
+    }
+
+    .btn-rsvp {
+      background: #851e3e;
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-rsvp:hover {
+      background: #681730;
+    }
+
+    .hint {
+      margin-top: 25px;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="envelope-wrapper" id="envelope">
+      <div class="seal-btn">Mở Thiệp ✨</div>
+      <div class="envelope-front-flaps"></div>
+
+      <!-- Nội dung thiệp -->
+      <div class="card">
+        <div class="card-border">
+          <span class="icon-grad">🎓</span>
+          <p class="subtitle">Lời Mời Tham Dự</p>
+          <h1>LỄ TỐT NGHIỆP</h1>
+          <p class="name">Biện Tiến Đạt</p>
+          
+          <div class="details">
+            <p><strong>Thời gian:</strong> 15:00 - Thứ Bảy, 3/10/2026</p>
+            <p><strong>Địa điểm:</strong> Đường Phan Tây Nhạc, Xuân Phương, Hà Hội</p>
+            <p>Trường Đại học Công Nghê Đông Á</p>
+          </div>
+
+          <button class="btn-rsvp" onclick="confirmAttendance(event)">Gửi lời chúc mừng 🎉</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint" id="hint-text">Chạm vào phong bì để mở</p>
+  </div>
+
+  <script>
+    const envelope = document.getElementById('envelope');
+    const hintText = document.getElementById('hint-text');
+
+    envelope.addEventListener('click', function(e) {
+      if (!envelope.classList.contains('open')) {
+        envelope.classList.add('open');
+        hintText.innerText = 'Rất hân hạnh được đón tiếp bạn!';
+        
+        // Bắn pháo hoa chào mừng
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    });
+
+    function confirmAttendance(event) {
+      event.stopPropagation(); // Ngăn sự kiện click vào phong bì
+      confetti({
+        particleCount: 120,
+        spread: 100,
+        origin: { y: 0.5 }
+      });
+      alert('Cảm ơn bạn đã xác nhận tham dự! Hẹn gặp lại bạn vào buổi lễ ❤️');
+    }
+  </script>
+</body>
+</html>
